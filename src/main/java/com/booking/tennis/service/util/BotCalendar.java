@@ -39,15 +39,12 @@ public class BotCalendar {
             List<InlineKeyboardButton> buttonLine = new ArrayList<>();
             final int weekLength = DayOfWeek.values().length;
             for (int numOfDay = 0; numOfDay < weekLength; numOfDay++) {
-                String buttonText;
                 boolean isBefore = isBeforeMonth(firstDayOfMonth, weekNum, numOfDay);
                 boolean isNext = isAfterMonth(lastDayOfMonth, dayCounter, weekNum);
                 if (shouldBeEmpty(firstDayOfMonth, lastDayOfMonth, dayCounter, weekNum, numOfDay)) {
-                    buttonText = " ";
-                    buttonLine.add(getButton(isBefore, isNext, localDateTime, buttonText, dayCounter));
+                    buttonLine.add(getButton(isBefore, isNext, localDateTime, " ", dayCounter));
                 } else {
-                    buttonText = String.valueOf(dayCounter);
-                    buttonLine.add(getButton(isBefore, isNext, localDateTime, buttonText, dayCounter++));
+                    buttonLine.add(getButton(isBefore, isNext, localDateTime, String.valueOf(dayCounter), dayCounter++));
                 }
             }
             buttons.add(buttonLine);
