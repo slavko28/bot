@@ -1,5 +1,6 @@
-package com.booking.tennis.service.util;
+package com.booking.tennis.service.impl;
 
+import com.booking.tennis.service.CalendarService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -15,10 +16,11 @@ import java.util.Locale;
 
 @Slf4j
 @Component
-public class BotCalendar {
+public class CalendarServiceImpl implements CalendarService {
 
     private InlineKeyboardMarkup calendar = new InlineKeyboardMarkup();
 
+    @Override
     public InlineKeyboardMarkup getCalendar(LocalDate localDate) {
         return calendar.setKeyboard(createCalendar(localDate));
     }
@@ -104,6 +106,7 @@ public class BotCalendar {
         log.debug("Add day of week to thr calendar header");
         List<InlineKeyboardButton> headerLine = new ArrayList<>();
         final DayOfWeek[] values = DayOfWeek.values();
+
         Arrays.stream(values).forEach(day ->
                 headerLine.add(new InlineKeyboardButton().setText(day.getDisplayName(TextStyle.SHORT, Locale.US)).setCallbackData("/header")));
         return headerLine;
