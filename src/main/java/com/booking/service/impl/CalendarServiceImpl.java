@@ -1,6 +1,6 @@
-package com.booking.tennis.service.impl;
+package com.booking.service.impl;
 
-import com.booking.tennis.service.CalendarService;
+import com.booking.service.CalendarService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;

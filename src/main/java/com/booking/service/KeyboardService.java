@@ -1,6 +1,6 @@
-package com.booking.tennis.service;
+package com.booking.service;
 
-import com.booking.tennis.model.Booking;
+import com.booking.model.Booking;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.util.List;
@@ -9,5 +9,5 @@ public interface KeyboardService {
 
     InlineKeyboardMarkup getStartKeyboard();
 
-    InlineKeyboardMarkup getBookingList(List<Booking> bookings);
+    InlineKeyboardMarkup getBookingListButtons(List<Booking> bookings);
 }

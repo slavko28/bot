@@ -1,6 +1,6 @@
-package com.booking.tennis.service;
+package com.booking.service;
 
-import com.booking.tennis.model.Booking;
+import com.booking.model.Booking;
 
 import java.time.LocalDateTime;
 import java.util.List;

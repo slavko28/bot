@@ -1,6 +1,6 @@
-package com.booking.tennis.repository;
+package com.booking.repository;
 
-import com.booking.tennis.model.Booking;
+import com.booking.model.Booking;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

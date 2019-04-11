@@ -1,9 +1,9 @@
-package com.booking.tennis;
+package com.booking;
 
-import com.booking.tennis.model.Booking;
-import com.booking.tennis.service.BookingService;
-import com.booking.tennis.service.CalendarService;
-import com.booking.tennis.service.KeyboardService;
+import com.booking.model.Booking;
+import com.booking.service.BookingService;
+import com.booking.service.CalendarService;
+import com.booking.service.KeyboardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +59,7 @@ public class Bot extends TelegramLongPollingBot {
             case "/bookingList":
                 final Integer userId = update.getCallbackQuery().getFrom().getId();
                 final List<Booking> allByUserId = bookingService.getAllByUserId(userId);
-                sendMessage(update.getCallbackQuery().getMessage().getChatId(), "List", keyboardService.getBookingList(allByUserId));
+                sendMessage(update.getCallbackQuery().getMessage().getChatId(), "List", keyboardService.getBookingListButtons(allByUserId));
                 break;
             default:
                 processCalendarCallback(update);
