@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -44,7 +47,7 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
-            sendMessage(update.getMessage().getChatId(), "Greeting!\nWhat do you want to do?", keyboardService.getStartKeyboard());
+            createMessage(update.getMessage(), "Hello!\nWhat do you want to do?", keyboardService.getStartKeyboard());
         } else {
             processCallbackQuery(update);
         }
@@ -52,18 +55,30 @@ public class Bot extends TelegramLongPollingBot {
 
     private void processCallbackQuery(Update update) {
         final String data = update.getCallbackQuery().getData();
+        SendMessage message;
         switch (data) {
             case "/booking":
-                sendMessage(update.getCallbackQuery().getMessage().getChatId(), "Please, select day.", calendarService.getCalendar(LocalDate.now()));
+                message = createMessage(update.getCallbackQuery().getMessage(), "Please, select day.", calendarService.getCalendar(LocalDate.now()));
+                sendMessage(message);
                 break;
             case "/bookingList":
                 final Integer userId = update.getCallbackQuery().getFrom().getId();
                 final List<Booking> allByUserId = bookingService.getAllByUserId(userId);
-                sendMessage(update.getCallbackQuery().getMessage().getChatId(), "List", keyboardService.getBookingListButtons(allByUserId));
+                message = createMessage(update.getCallbackQuery().getMessage(), "List", keyboardService.getBookingListButtons(allByUserId));
+                sendMessage(message);
                 break;
             default:
                 processCalendarCallback(update);
         }
+    }
+
+    private SendMessage createMessage(Message message, String text, InlineKeyboardMarkup keyboardMarkup) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+        sendMessage.setChatId(message.getChatId());
+        sendMessage.setText(text);
+        sendMessage.setReplyMarkup(keyboardMarkup);
+        return sendMessage;
     }
 
     private void processCalendarCallback(Update update) {
@@ -76,7 +91,8 @@ public class Bot extends TelegramLongPollingBot {
             case "another":
                 try {
                     LocalDate localDate = LocalDate.parse(strings.get(1));
-                    sendMessage(update.getCallbackQuery().getMessage().getChatId(), "Please, select day.", calendarService.getCalendar(localDate));
+                    EditMessageText message = editMessage(update.getCallbackQuery().getMessage(), calendarService.getCalendar(localDate));
+                    sendMessage(message);
                 } catch (DateTimeParseException e) {
                     log.warn("Can not parse to date: {}", data);
                 }
@@ -84,7 +100,16 @@ public class Bot extends TelegramLongPollingBot {
             default:
                 log.warn("Can not parse calendar request: {}", data);
         }
+    }
 
+    private EditMessageText editMessage(Message message, InlineKeyboardMarkup keyboardMarkup) {
+        EditMessageText editMessageText = new EditMessageText();
+        editMessageText.setMessageId(message.getMessageId());
+        editMessageText.enableMarkdown(true);
+        editMessageText.setChatId(message.getChatId());
+        editMessageText.setText(message.getText());
+        editMessageText.setReplyMarkup(keyboardMarkup);
+        return editMessageText;
     }
 
     @Override
@@ -97,16 +122,12 @@ public class Bot extends TelegramLongPollingBot {
         return botToken;
     }
 
-    private synchronized void sendMessage(Long chatId, String text, InlineKeyboardMarkup keyboardMarkup) {
-        SendMessage message = new SendMessage();
-        message.enableMarkdown(true);
-        message.setChatId(chatId);
-        message.setText(text);
-        message.setReplyMarkup(keyboardMarkup);
+    private synchronized void sendMessage(BotApiMethod message) {
         try {
             execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
+
 }
