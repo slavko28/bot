@@ -47,32 +47,55 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
-            createMessage(update.getMessage(), "Hello!\nWhat do you want to do?", keyboardService.getStartKeyboard());
+            SendMessage startMessage = getStartMessage(update);
+            sendMessage(startMessage);
         } else {
             processCallbackQuery(update);
         }
     }
 
+    private SendMessage getStartMessage(Update update) {
+        return createMessage(update.getCallbackQuery().getMessage(), "Hello!\nWhat do you want to do?", keyboardService.getStartKeyboard());
+    }
+
     private void processCallbackQuery(Update update) {
         final String data = update.getCallbackQuery().getData();
-        SendMessage message;
-        switch (data) {
-            case "/booking":
-                message = createMessage(update.getCallbackQuery().getMessage(), "Please, select day.", calendarService.getCalendar(LocalDate.now()));
-                sendMessage(message);
-                break;
-            case "/bookingList":
-                final Integer userId = update.getCallbackQuery().getFrom().getId();
-                final List<Booking> allByUserId = bookingService.getAllByUserId(userId);
-                message = createMessage(update.getCallbackQuery().getMessage(), "List", keyboardService.getBookingListButtons(allByUserId));
-                sendMessage(message);
-                break;
-            default:
-                processCalendarCallback(update);
+        if (!data.isBlank()) {
+            switch (data) {
+                case "/booking":
+                    log.info("Receive \"/booking\" request");
+                    createAndSendMessage(update, "Please, select day.", calendarService.getCalendar(LocalDate.now()));
+                    break;
+                case "/bookingList":
+                    log.info("Receive \"/bookingList\" request");
+                    final List<Booking> allByUserId = getBookings(update.getCallbackQuery().getFrom().getId());
+                    createAndSendMessage(update, "List", keyboardService.getBookingListButtons(allByUserId));
+                    break;
+                default:
+                    processCalendarCallback(update);
+            }
+        } else {
+            log.info("The callback query data is empty");
+            createAndSendStartMessage(update);
         }
     }
 
+    private void createAndSendMessage(Update update, String text, InlineKeyboardMarkup markup) {
+        SendMessage message = createMessage(update.getCallbackQuery().getMessage(), text, markup);
+        sendMessage(message);
+    }
+
+    private void createAndSendStartMessage(Update update) {
+        SendMessage startMessage = getStartMessage(update);
+        sendMessage(startMessage);
+    }
+
+    private List<Booking> getBookings(Integer userId) {
+        return bookingService.getAllByUserId(userId);
+    }
+
     private SendMessage createMessage(Message message, String text, InlineKeyboardMarkup keyboardMarkup) {
+        log.info("Create message for chat id: {}", message.getChatId());
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(message.getChatId());
@@ -86,7 +109,7 @@ public class Bot extends TelegramLongPollingBot {
         List<String> strings = Arrays.asList(data.split("/"));
         switch (strings.get(0)) {
             case "current":
-                log.info("processing request to booking list for date {}", strings.get(1));
+                log.info("Processing request for booking list. Date - {}", strings.get(1));
                 break;
             case "another":
                 try {
@@ -103,6 +126,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private EditMessageText editMessage(Message message, InlineKeyboardMarkup keyboardMarkup) {
+        log.info("Edit message with id: {}, for chat id: {}", message.getMessageId(), message.getChatId());
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setMessageId(message.getMessageId());
         editMessageText.enableMarkdown(true);
@@ -125,8 +149,9 @@ public class Bot extends TelegramLongPollingBot {
     private synchronized void sendMessage(BotApiMethod message) {
         try {
             execute(message);
+            log.info("Message send successfully");
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("Can not send message.\n{}", e.getMessage());
         }
     }
 
