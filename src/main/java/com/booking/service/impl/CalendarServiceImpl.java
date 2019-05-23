@@ -96,20 +96,23 @@ public class CalendarServiceImpl implements CalendarService {
     private List<InlineKeyboardButton> addMonthNavigation(LocalDate localDate) {
         log.debug("Add month navigation to the calendar header");
         List<InlineKeyboardButton> headerLine = new ArrayList<>();
-        headerLine.add(new InlineKeyboardButton().setText("<").setCallbackData(getPreviousMonth(localDate)));
-        headerLine.add(new InlineKeyboardButton().setText(localDate.getMonth().name()).setCallbackData("/month"));
-        headerLine.add(new InlineKeyboardButton().setText(">").setCallbackData(getNextMonth(localDate)));
+        headerLine.add(createButton("<", getPreviousMonth(localDate)));
+        headerLine.add(createButton(localDate.getMonth().name(), "/month"));
+        headerLine.add(createButton(">", getNextMonth(localDate)));
         return headerLine;
     }
 
     private List<InlineKeyboardButton> addWeekDays() {
-        log.debug("Add day of week to thr calendar header");
+        log.debug("Add day of week to the calendar header");
         List<InlineKeyboardButton> headerLine = new ArrayList<>();
         final DayOfWeek[] values = DayOfWeek.values();
-
         Arrays.stream(values).forEach(day ->
-                headerLine.add(new InlineKeyboardButton().setText(day.getDisplayName(TextStyle.SHORT, Locale.US)).setCallbackData("/header")));
+                headerLine.add(createButton(day.getDisplayName(TextStyle.SHORT, Locale.US), "/header")));
         return headerLine;
+    }
+
+    private InlineKeyboardButton createButton(String buttonText, String callbackData) {
+        return new InlineKeyboardButton().setText(buttonText).setCallbackData(callbackData);
     }
 
 }
