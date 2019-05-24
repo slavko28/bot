@@ -36,16 +36,16 @@ public class CalendarServiceImpl implements CalendarService {
     private void addDays(LocalDate localDateTime, List<List<InlineKeyboardButton>> buttons) {
         final int firstDayOfMonth = localDateTime.withDayOfMonth(1).getDayOfWeek().getValue();
         int numberOfDays = getNumberOfDays(localDateTime);
-        int maxWeekNum = getMaxWeekNum(firstDayOfMonth);
+        int numberOfWeeks = getNumberOfWeeks(firstDayOfMonth);
         int dayCounter = 1;
-        for (int weekNum = 0; weekNum < maxWeekNum; weekNum++) {
+        for (int weekCount = 0; weekCount < numberOfWeeks; weekCount++) {
             List<InlineKeyboardButton> buttonLine = new ArrayList<>();
             final int weekLength = DayOfWeek.values().length;
             if (!isEndOfMonth(dayCounter, numberOfDays)) {
                 for (int numOfDay = 0; numOfDay < weekLength; numOfDay++) {
-                    boolean isBefore = isBeforeMonth(firstDayOfMonth, weekNum, numOfDay);
-                    boolean isNext = isAfterMonth(numberOfDays, dayCounter, weekNum);
-                    if (shouldBeEmpty(firstDayOfMonth, numberOfDays, dayCounter, weekNum, numOfDay)) {
+                    boolean isBefore = isBeforeMonth(firstDayOfMonth, weekCount, numOfDay);
+                    boolean isNext = isAfterMonth(numberOfDays, dayCounter, weekCount);
+                    if (shouldBeEmpty(firstDayOfMonth, numberOfDays, dayCounter, weekCount, numOfDay)) {
                         buttonLine.add(getButton(isBefore, isNext, localDateTime, " ", dayCounter));
                     } else {
                         buttonLine.add(getButton(isBefore, isNext, localDateTime, String.valueOf(dayCounter), dayCounter++));
@@ -60,7 +60,7 @@ public class CalendarServiceImpl implements CalendarService {
         return dayCounter > numberOfDays;
     }
 
-    private int getMaxWeekNum(int firstDayOfMonth) {
+    private int getNumberOfWeeks(int firstDayOfMonth) {
         return (firstDayOfMonth > 5) ? 6 : 5;
     }
 
