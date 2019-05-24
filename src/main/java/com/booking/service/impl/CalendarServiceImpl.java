@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     private void addDays(LocalDate localDateTime, List<List<InlineKeyboardButton>> buttons) {
         final int firstDayOfMonth = localDateTime.withDayOfMonth(1).getDayOfWeek().getValue();
-        final int lastDayOfMonth = localDateTime.getMonth().maxLength();
+        int lastDayOfMonth = getLastDayOfMonth(localDateTime);
         int dayCounter = 1;
         for (int weekNum = 0; weekNum < 5; weekNum++) {
             List<InlineKeyboardButton> buttonLine = new ArrayList<>();
@@ -50,6 +51,14 @@ public class CalendarServiceImpl implements CalendarService {
                 }
             }
             buttons.add(buttonLine);
+        }
+    }
+
+    private int getLastDayOfMonth(LocalDate localDateTime) {
+        if(localDateTime.getMonth().equals(Month.FEBRUARY) && !localDateTime.isLeapYear()) {
+            return localDateTime.getMonth().minLength();
+        } else {
+            return localDateTime.getMonth().maxLength();
         }
     }
 

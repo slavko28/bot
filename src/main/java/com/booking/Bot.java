@@ -55,7 +55,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private SendMessage getStartMessage(Update update) {
-        return createMessage(update.getCallbackQuery().getMessage(), "Hello!\nWhat do you want to do?", keyboardService.getStartKeyboard());
+        return createMessage(update.getMessage(), "Hello!\nWhat do you want to do?", keyboardService.getStartKeyboard());
     }
 
     private void processCallbackQuery(Update update) {
