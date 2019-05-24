@@ -24,16 +24,15 @@ public class KeyboardServiceImpl implements KeyboardService {
 
     private List<List<InlineKeyboardButton>> getStartButtons() {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-        List<InlineKeyboardButton> buttonLine = getButtonForStart();
-        buttons.add(buttonLine);
+        List<InlineKeyboardButton> booking = new ArrayList<>();
+        booking.add(createButton("New booking", "/booking"));
+        booking.add(createButton("View my bookings", "/bookingList"));
+        buttons.add(booking);
         return buttons;
     }
 
-    private List<InlineKeyboardButton> getButtonForStart() {
-        List<InlineKeyboardButton> booking = new ArrayList<>();
-        booking.add(new InlineKeyboardButton().setText("New booking").setCallbackData("/booking"));
-        booking.add(new InlineKeyboardButton().setText("View my bookings").setCallbackData("/bookingList"));
-        return booking;
+    private InlineKeyboardButton createButton(String buttonText, String callbackData) {
+        return new InlineKeyboardButton().setText(buttonText).setCallbackData(callbackData);
     }
 
     @Override
