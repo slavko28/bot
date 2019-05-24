@@ -123,7 +123,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     private String getMonthButtonText(LocalDate localDate) {
         String shortName = localDate.getMonth().getDisplayName(TextStyle.SHORT, Locale.US);
-        return shortName + "\n" + localDate.getYear();
+        return shortName + " " + localDate.getYear();
     }
 
     private List<InlineKeyboardButton> addWeekDays() {
