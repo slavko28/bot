@@ -34,9 +34,10 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     private void addDays(LocalDate localDateTime, List<List<InlineKeyboardButton>> buttons) {
+        log.debug("Adding buttons to the calendar");
         final int firstDayOfMonth = localDateTime.withDayOfMonth(1).getDayOfWeek().getValue();
-        int numberOfDays = getNumberOfDays(localDateTime);
-        int numberOfWeeks = getNumberOfWeeks(firstDayOfMonth);
+        final int numberOfDays = getNumberOfDays(localDateTime);
+        final int numberOfWeeks = getNumberOfWeeks(firstDayOfMonth);
         int dayCounter = 1;
         for (int weekCount = 0; weekCount < numberOfWeeks; weekCount++) {
             List<InlineKeyboardButton> buttonLine = new ArrayList<>();
@@ -129,8 +130,7 @@ public class CalendarServiceImpl implements CalendarService {
     private List<InlineKeyboardButton> addWeekDays() {
         log.debug("Add day of week to the calendar header");
         List<InlineKeyboardButton> headerLine = new ArrayList<>();
-        final DayOfWeek[] values = DayOfWeek.values();
-        Arrays.stream(values).forEach(day ->
+        Arrays.stream(DayOfWeek.values()).forEach(day ->
                 headerLine.add(createButton(day.getDisplayName(TextStyle.SHORT, Locale.US), "/header")));
         return headerLine;
     }

@@ -109,6 +109,7 @@ public class Bot extends TelegramLongPollingBot {
         List<String> strings = Arrays.asList(data.split("/"));
         switch (strings.get(0)) {
             case "current":
+//               TODO: add implementation
                 log.info("Processing request for booking list. Date - {}", strings.get(1));
                 break;
             case "another":
