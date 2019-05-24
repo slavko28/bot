@@ -19,10 +19,9 @@ import java.util.Locale;
 @Component
 public class CalendarServiceImpl implements CalendarService {
 
-    private InlineKeyboardMarkup calendar = new InlineKeyboardMarkup();
-
     @Override
     public InlineKeyboardMarkup getCalendar(LocalDate localDate) {
+        InlineKeyboardMarkup calendar = new InlineKeyboardMarkup();
         return calendar.setKeyboard(createCalendar(localDate));
     }
 
@@ -36,26 +35,37 @@ public class CalendarServiceImpl implements CalendarService {
 
     private void addDays(LocalDate localDateTime, List<List<InlineKeyboardButton>> buttons) {
         final int firstDayOfMonth = localDateTime.withDayOfMonth(1).getDayOfWeek().getValue();
-        int lastDayOfMonth = getLastDayOfMonth(localDateTime);
+        int numberOfDays = getNumberOfDays(localDateTime);
+        int maxWeekNum = getMaxWeekNum(firstDayOfMonth);
         int dayCounter = 1;
-        for (int weekNum = 0; weekNum < 5; weekNum++) {
+        for (int weekNum = 0; weekNum < maxWeekNum; weekNum++) {
             List<InlineKeyboardButton> buttonLine = new ArrayList<>();
             final int weekLength = DayOfWeek.values().length;
-            for (int numOfDay = 0; numOfDay < weekLength; numOfDay++) {
-                boolean isBefore = isBeforeMonth(firstDayOfMonth, weekNum, numOfDay);
-                boolean isNext = isAfterMonth(lastDayOfMonth, dayCounter, weekNum);
-                if (shouldBeEmpty(firstDayOfMonth, lastDayOfMonth, dayCounter, weekNum, numOfDay)) {
-                    buttonLine.add(getButton(isBefore, isNext, localDateTime, " ", dayCounter));
-                } else {
-                    buttonLine.add(getButton(isBefore, isNext, localDateTime, String.valueOf(dayCounter), dayCounter++));
+            if (!isEndOfMonth(dayCounter, numberOfDays)) {
+                for (int numOfDay = 0; numOfDay < weekLength; numOfDay++) {
+                    boolean isBefore = isBeforeMonth(firstDayOfMonth, weekNum, numOfDay);
+                    boolean isNext = isAfterMonth(numberOfDays, dayCounter, weekNum);
+                    if (shouldBeEmpty(firstDayOfMonth, numberOfDays, dayCounter, weekNum, numOfDay)) {
+                        buttonLine.add(getButton(isBefore, isNext, localDateTime, " ", dayCounter));
+                    } else {
+                        buttonLine.add(getButton(isBefore, isNext, localDateTime, String.valueOf(dayCounter), dayCounter++));
+                    }
                 }
             }
             buttons.add(buttonLine);
         }
     }
 
-    private int getLastDayOfMonth(LocalDate localDateTime) {
-        if(localDateTime.getMonth().equals(Month.FEBRUARY) && !localDateTime.isLeapYear()) {
+    private boolean isEndOfMonth(int dayCounter, int numberOfDays) {
+        return dayCounter > numberOfDays;
+    }
+
+    private int getMaxWeekNum(int firstDayOfMonth) {
+        return (firstDayOfMonth > 5) ? 6 : 5;
+    }
+
+    private int getNumberOfDays(LocalDate localDateTime) {
+        if (localDateTime.getMonth().equals(Month.FEBRUARY) && !localDateTime.isLeapYear()) {
             return localDateTime.getMonth().minLength();
         } else {
             return localDateTime.getMonth().maxLength();
@@ -106,9 +116,14 @@ public class CalendarServiceImpl implements CalendarService {
         log.debug("Add month navigation to the calendar header");
         List<InlineKeyboardButton> headerLine = new ArrayList<>();
         headerLine.add(createButton("<", getPreviousMonth(localDate)));
-        headerLine.add(createButton(localDate.getMonth().name(), "/month"));
+        headerLine.add(createButton(getMonthButtonText(localDate), "/month"));
         headerLine.add(createButton(">", getNextMonth(localDate)));
         return headerLine;
+    }
+
+    private String getMonthButtonText(LocalDate localDate) {
+        String shortName = localDate.getMonth().getDisplayName(TextStyle.SHORT, Locale.US);
+        return shortName + "\n" + localDate.getYear();
     }
 
     private List<InlineKeyboardButton> addWeekDays() {
