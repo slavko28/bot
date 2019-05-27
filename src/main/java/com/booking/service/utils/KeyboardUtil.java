@@ -1,7 +1,6 @@
-package com.booking.service.impl;
+package com.booking.service.utils;
 
 import com.booking.model.Booking;
-import com.booking.service.KeyboardService;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,9 +12,8 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class KeyboardServiceImpl implements KeyboardService {
+public class KeyboardUtil {
 
-    @Override
     public InlineKeyboardMarkup getStartKeyboard() {
         InlineKeyboardMarkup startKeyboardMarkup = new InlineKeyboardMarkup();
         startKeyboardMarkup.setKeyboard(getStartButtons());
@@ -35,7 +33,6 @@ public class KeyboardServiceImpl implements KeyboardService {
         return new InlineKeyboardButton().setText(buttonText).setCallbackData(callbackData);
     }
 
-    @Override
     public InlineKeyboardMarkup getBookingListButtons(List<Booking> bookings) {
         log.info("Prepare booking list buttons");
         InlineKeyboardMarkup listKeyboardMarkup = new InlineKeyboardMarkup();

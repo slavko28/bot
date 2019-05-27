@@ -2,8 +2,8 @@ package com.booking;
 
 import com.booking.model.Booking;
 import com.booking.service.BookingService;
-import com.booking.service.CalendarService;
-import com.booking.service.KeyboardService;
+import com.booking.service.utils.CalendarUtil;
+import com.booking.service.utils.KeyboardUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +26,11 @@ import java.util.List;
 @Component
 public class Bot extends TelegramLongPollingBot {
 
-    private final CalendarService calendarService;
+    private final CalendarUtil calendarUtil;
 
     private final BookingService bookingService;
 
-    private final KeyboardService keyboardService;
+    private final KeyboardUtil keyboardUtil;
 
     @Value("${telegram.bot.name}")
     private String botName;
@@ -38,10 +38,10 @@ public class Bot extends TelegramLongPollingBot {
     private String botToken;
 
     @Autowired
-    public Bot(CalendarService calendarService, BookingService bookingService, KeyboardService keyboardService) {
-        this.calendarService = calendarService;
+    public Bot(CalendarUtil calendarUtil, BookingService bookingService, KeyboardUtil keyboardUtil) {
+        this.calendarUtil = calendarUtil;
         this.bookingService = bookingService;
-        this.keyboardService = keyboardService;
+        this.keyboardUtil = keyboardUtil;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private SendMessage getStartMessage(Update update) {
-        return createMessage(update.getMessage(), "Hello!\nWhat do you want to do?", keyboardService.getStartKeyboard());
+        return createMessage(update.getMessage(), "Hello!\nWhat do you want to do?", keyboardUtil.getStartKeyboard());
     }
 
     private void processCallbackQuery(Update update) {
@@ -64,12 +64,12 @@ public class Bot extends TelegramLongPollingBot {
             switch (data) {
                 case "/booking":
                     log.info("Receive \"/booking\" request");
-                    createAndSendMessage(update, "Please, select day.", calendarService.getCalendar(LocalDate.now()));
+                    createAndSendMessage(update, "Please, select day.", calendarUtil.getCalendar(LocalDate.now()));
                     break;
                 case "/bookingList":
                     log.info("Receive \"/bookingList\" request");
                     final List<Booking> allByUserId = getBookings(update.getCallbackQuery().getFrom().getId());
-                    createAndSendMessage(update, "List", keyboardService.getBookingListButtons(allByUserId));
+                    createAndSendMessage(update, "List", keyboardUtil.getBookingListButtons(allByUserId));
                     break;
                 default:
                     processCalendarCallback(update);
@@ -115,7 +115,7 @@ public class Bot extends TelegramLongPollingBot {
             case "another":
                 try {
                     LocalDate localDate = LocalDate.parse(strings.get(1));
-                    EditMessageText message = editMessage(update.getCallbackQuery().getMessage(), calendarService.getCalendar(localDate));
+                    EditMessageText message = editMessage(update.getCallbackQuery().getMessage(), calendarUtil.getCalendar(localDate));
                     sendMessage(message);
                 } catch (DateTimeParseException e) {
                     log.warn("Can not parse to date: {}", data);

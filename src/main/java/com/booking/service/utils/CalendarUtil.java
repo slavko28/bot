@@ -1,6 +1,5 @@
-package com.booking.service.impl;
+package com.booking.service.utils;
 
-import com.booking.service.CalendarService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -17,9 +16,8 @@ import java.util.Locale;
 
 @Slf4j
 @Component
-public class CalendarServiceImpl implements CalendarService {
+public class CalendarUtil {
 
-    @Override
     public InlineKeyboardMarkup getCalendar(LocalDate localDate) {
         InlineKeyboardMarkup calendar = new InlineKeyboardMarkup();
         return calendar.setKeyboard(createCalendar(localDate));
