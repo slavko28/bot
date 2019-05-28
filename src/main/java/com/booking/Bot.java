@@ -97,7 +97,7 @@ public class Bot extends TelegramLongPollingBot {
     private SendMessage createMessage(Message message, String text, InlineKeyboardMarkup keyboardMarkup) {
         log.info("Create message for chat id: {}", message.getChatId());
         SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
+        sendMessage.enableMarkdown(false);
         sendMessage.setChatId(message.getChatId());
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(keyboardMarkup);
@@ -109,22 +109,35 @@ public class Bot extends TelegramLongPollingBot {
         List<String> strings = Arrays.asList(data.split("/"));
         switch (strings.get(0)) {
             case "current":
-//               TODO: add implementation
-                log.info("Processing request for booking list. Date - {}", strings.get(1));
+                processCurrentMonth(update, strings.get(1));
                 break;
             case "another":
-                try {
-                    LocalDate localDate = LocalDate.parse(strings.get(1));
-                    EditMessageText message = editMessage(update.getCallbackQuery().getMessage(), calendarUtil.getCalendar(localDate));
-                    sendMessage(message);
-                } catch (DateTimeParseException e) {
-                    log.warn("Can not parse to date: {}", data);
-                }
+                processAnotherMonth(update, data, strings.get(1));
                 break;
             default:
                 log.warn("Can not parse calendar request: {}", data);
         }
     }
+
+    private void processCurrentMonth(Update update, String selectedDate) {
+        log.info("Processing request for booking list. Date - {}", selectedDate);
+        List<Booking> availableBookingList = bookingService.getAllBookingsByDate(selectedDate);
+        SendMessage message = createMessage(update.getCallbackQuery().getMessage(),
+                "Selected - " + selectedDate, keyboardUtil.getBookingListButtons(availableBookingList));
+        sendMessage(message);
+    }
+
+    private void processAnotherMonth(Update update, String data, String selectedDate) {
+        log.info("Processing request fot another month. Selected date - {}", selectedDate);
+        try {
+            LocalDate localDate = LocalDate.parse(selectedDate);
+            EditMessageText message = editMessage(update.getCallbackQuery().getMessage(), calendarUtil.getCalendar(localDate));
+            sendMessage(message);
+        } catch (DateTimeParseException e) {
+            log.warn("Can not parse to date: {}", data);
+        }
+    }
+
 
     private EditMessageText editMessage(Message message, InlineKeyboardMarkup keyboardMarkup) {
         log.info("Edit message with id: {}, for chat id: {}", message.getMessageId(), message.getChatId());

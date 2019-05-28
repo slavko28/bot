@@ -3,15 +3,17 @@ package com.booking.service.utils;
 import com.booking.model.Booking;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service
+@Component
 public class KeyboardUtil {
 
     public InlineKeyboardMarkup getStartKeyboard() {
@@ -20,12 +22,20 @@ public class KeyboardUtil {
         return startKeyboardMarkup;
     }
 
+    private String getButtonText(Booking booking) {
+        return getTimeInText(booking.getStart()) + " - " + getTimeInText(booking.getFinish());
+    }
+
+    private String getTimeInText(LocalDateTime localDateTime) {
+        return localDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES).toString();
+    }
+
     private List<List<InlineKeyboardButton>> getStartButtons() {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-        List<InlineKeyboardButton> booking = new ArrayList<>();
-        booking.add(createButton("New booking", "/booking"));
-        booking.add(createButton("View my bookings", "/bookingList"));
-        buttons.add(booking);
+        List<InlineKeyboardButton> buttonsLine = new ArrayList<>();
+        buttonsLine.add(createButton("New booking", "/booking"));
+        buttonsLine.add(createButton("View my bookings", "/bookingList"));
+        buttons.add(buttonsLine);
         return buttons;
     }
 
@@ -43,8 +53,7 @@ public class KeyboardUtil {
     private List<List<InlineKeyboardButton>> getButtonsForBookingList(List<Booking> bookings) {
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         bookings.forEach(booking -> buttons.add(ImmutableList.of(new InlineKeyboardButton()
-                .setText(String.format("From: %s To: %s", booking.getStart().toString(), booking.getFinish().toString()))
-                .setCallbackData(booking.getId().toString()))));
+                .setText(getButtonText(booking)).setCallbackData(booking.getId().toString()))));
         return buttons;
     }
 

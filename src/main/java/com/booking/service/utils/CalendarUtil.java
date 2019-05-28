@@ -126,7 +126,7 @@ public class CalendarUtil {
     }
 
     private List<InlineKeyboardButton> addWeekDays() {
-        log.debug("Add day of week to the calendar header");
+        log.debug("Added days of the week to the calendar header");
         List<InlineKeyboardButton> headerLine = new ArrayList<>();
         Arrays.stream(DayOfWeek.values()).forEach(day ->
                 headerLine.add(createButton(day.getDisplayName(TextStyle.SHORT, Locale.US), "/header")));

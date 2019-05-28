@@ -13,4 +13,6 @@ public interface BookingService {
 
     List<Booking> getAllByUserId(Integer id);
 
+    List<Booking> getAllBookingsByDate(String selectedDate);
+
 }

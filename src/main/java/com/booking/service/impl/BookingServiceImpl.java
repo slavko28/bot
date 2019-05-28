@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -40,12 +41,19 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getAllByUserId(Integer userId) {
         log.info("Get all bookings by user Id: {}", userId);
-//        final Booking booking = Booking.builder()
-//                .id(1)
-//                .start(LocalDateTime.now())
-//                .finish(LocalDateTime.now().plusMinutes(15))
-//                .build();
-//        return new ArrayList<>(Collections.singleton(booking));
         return repository.findAllByUserId(userId);
     }
+
+    @Override
+    public List<Booking> getAllBookingsByDate(String selectedDate) {
+//        LocalDate localDate = LocalDate.parse(selectedDate);
+//        return repository.findAllByDate(localDate);
+        Booking booking = Booking.builder()
+                .id(1)
+                .start(LocalDateTime.now())
+                .finish(LocalDateTime.now().plusMinutes(15))
+                .build();
+        return Collections.singletonList(booking);
+    }
+
 }
