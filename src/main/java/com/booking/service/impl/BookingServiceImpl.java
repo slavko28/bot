@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -27,8 +27,9 @@ public class BookingServiceImpl implements BookingService {
         log.info("Create new booking. User Id: {}, start time: {}", userId, start.toString());
         Booking booking = Booking.builder()
                 .userId(userId)
-                .start(start)
-                .finish(start.plusMinutes(15))
+                .date(start.toLocalDate())
+                .startTime(start.toLocalTime())
+                .finishTime(start.toLocalTime().plusMinutes(15))
                 .build();
         repository.save(booking);
     }
@@ -46,14 +47,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getAllBookingsByDate(String selectedDate) {
-//        LocalDate localDate = LocalDate.parse(selectedDate);
-//        return repository.findAllByDate(localDate);
-        Booking booking = Booking.builder()
-                .id(1)
-                .start(LocalDateTime.now())
-                .finish(LocalDateTime.now().plusMinutes(15))
-                .build();
-        return Collections.singletonList(booking);
+        LocalDate localDate = LocalDate.parse(selectedDate);
+        return repository.findAllByDate(localDate);
     }
 
 }

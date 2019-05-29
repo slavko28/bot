@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +23,11 @@ public class KeyboardUtil {
     }
 
     private String getButtonText(Booking booking) {
-        return getTimeInText(booking.getStart()) + " - " + getTimeInText(booking.getFinish());
+        return getTimeInText(booking.getStartTime()) + " - " + getTimeInText(booking.getFinishTime());
     }
 
-    private String getTimeInText(LocalDateTime localDateTime) {
-        return localDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES).toString();
+    private String getTimeInText(LocalTime localTime) {
+        return localTime.truncatedTo(ChronoUnit.MINUTES).toString();
     }
 
     private List<List<InlineKeyboardButton>> getStartButtons() {

@@ -1,19 +1,27 @@
 package com.booking.model;
 
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.data.redis.core.RedisHash;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-@Data
 @Builder
-@RedisHash
+@Data
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
+@Entity
 public class Booking {
 
-    Integer id;
-    Integer userId;
-    LocalDateTime start;
-    LocalDateTime finish;
+    @Id
+    @GeneratedValue
+    private Integer id;
+    private Integer userId;
+
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime finishTime;
 
 }
